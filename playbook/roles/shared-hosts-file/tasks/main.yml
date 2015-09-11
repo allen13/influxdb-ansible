@@ -1,0 +1,3 @@
+- name: share hosts file accross all servers
+  template: src=hosts dest=/etc/hosts
+  when: etc_hosts is defined

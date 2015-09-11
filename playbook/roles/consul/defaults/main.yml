@@ -1,0 +1,8 @@
+consul_domain: os.
+consul_log_level: "ERR"
+consul_bootstrap_expect: 3
+is_consul_server: false
+has_consul_web_ui: false
+
+consul_web_ui_users:
+  - {name: 'admin', password: 'admin'}

@@ -1,0 +1,21 @@
+- name: all
+  hosts: all
+  gather_facts: false
+  sudo: true
+  roles:
+    - disable-require-tty
+    - selinux
+    - shared-hosts-file
+    - consul
+    - influxdb-telegraf
+  tags:
+    - common
+
+- name: influxdb
+  hosts: influxdb
+  gather_facts: false
+  sudo: true
+  roles:
+    - influxdb
+  tags:
+    - influxdb

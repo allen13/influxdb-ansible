@@ -1,0 +1,18 @@
+- name: download influxdb
+  get_url:
+    url: https://s3.amazonaws.com/influxdb/influxdb-0.9.3-1.x86_64.rpm
+    dest: /opt/
+
+- name: install influxdb
+  yum: name=/opt/influxdb-0.9.3-1.x86_64.rpm
+
+- name: setup influxdb config
+  template:
+    src: influxdb.conf
+    dest: /etc/opt/influxdb/influxdb.conf
+    owner: influxdb
+    group: influxdb
+  notify: restart influxdb
+
+- name: start and enable influxdb
+  service: name=influxdb state=started enabled=yes

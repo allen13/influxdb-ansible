@@ -1,0 +1,12 @@
+- name: install dnsmasq
+  yum: name=dnsmasq state=latest
+
+- name: configure dnsmasq
+  copy:
+    content: 'server=/os/127.0.0.1#8600'
+    dest: /etc/dnsmasq.d/10-consul
+  notify:
+    - restart dnsmasq
+
+- name: start and enable dnsmasq
+  service: name=dnsmasq state=started enabled=yes

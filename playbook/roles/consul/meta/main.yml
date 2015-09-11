@@ -1,0 +1,2 @@
+dependencies:
+  - { role: apache, when: "{{ inventory_hostname in groups['consul'] }}" }

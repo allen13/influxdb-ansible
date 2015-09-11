@@ -1,0 +1,9 @@
+- name: install grafana
+  yum: name=grafana state=latest
+
+- name: override grafana.ini file
+  template: src=grafana.ini dest=/etc/grafana/grafana.ini
+  notify: restart grafana server
+
+- name: start grafana
+  service: name=grafana-server state=started enabled=yes

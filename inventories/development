@@ -1,0 +1,14 @@
+[development]
+influxdb-01 ansible_ssh_host=10.0.0.101 private_ip=10.0.1.101
+influxdb-02 ansible_ssh_host=10.0.0.102 private_ip=10.0.1.102
+influxdb-03 ansible_ssh_host=10.0.0.103 private_ip=10.0.1.103
+
+[development:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_pass=vagrant
+
+[consul]
+influxdb-01
+
+[influxdb]
+influxdb-0[1:3]
