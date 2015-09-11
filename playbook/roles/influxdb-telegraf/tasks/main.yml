@@ -5,3 +5,10 @@
 
 - name: install influxdb telegraf
   yum: name=/opt/telegraf-0.1.8-1.x86_64.rpm
+
+- name: install telegraf setup
+  template: src=telegraf.conf dest=/etc/opt/telegraf/telegraf.conf
+  notify: restart telegraf
+
+- name: start and enable telegraf
+  service: name=telegraf state=restarted enabled=yes

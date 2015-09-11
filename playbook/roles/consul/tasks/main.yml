@@ -1,4 +1,0 @@
-- include: install.yml
-- include: dnsmasq.yml
-- { include: install-ui.yml, when: "{{ inventory_hostname in groups['consul'] }}" }
-- include: checks.yml

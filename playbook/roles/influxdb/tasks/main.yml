@@ -10,8 +10,21 @@
   template:
     src: influxdb.conf
     dest: /etc/opt/influxdb/influxdb.conf
-    owner: influxdb
-    group: influxdb
+  notify: restart influxdb
+
+- name: setup influxdb environment file
+  template:
+    src: influxdb_env
+    dest: /etc/default/influxdb
+  notify: restart influxdb
+
+- name: install influxdb service file
+  template: src=influxdb.service dest=/usr/lib/systemd/system/influxdb.service
+  register: service
+
+- name: reload service files
+  shell: systemctl daemon-reload
+  when: service.changed
   notify: restart influxdb
 
 - name: start and enable influxdb

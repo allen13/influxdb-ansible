@@ -1,8 +1,0 @@
-{
-  "check": {
-    "id": "mem-util",
-    "name": "Memory utilization",
-    "script": "/usr/bin/check_linux_memory -w 3 -c 2",
-    "interval": "10s"
-  }
-}

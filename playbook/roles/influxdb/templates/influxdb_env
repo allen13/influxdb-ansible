@@ -1,0 +1,6 @@
+{% if inventory_hostname == groups['influxdb'][0] %}
+{% elif inventory_hostname == groups['influxdb'][1] %}
+INFLUXD_OPTS="-join {{ hostvars[groups['influxdb'][0]]['private_ip']}}:8088"
+{% else %}
+INFLUXD_OPTS="-join {{ hostvars[groups['influxdb'][0]]['private_ip']}}:8088,{{ hostvars[groups['influxdb'][1]]['private_ip']}}:8088"
+{% endif %}

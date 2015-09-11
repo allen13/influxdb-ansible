@@ -1,6 +1,0 @@
-- name: install consul web ui
-  unarchive: src=consul-web_ui_0.5.0.tar.gz dest=/opt/consul
-
-- name: setup apache config
-  template: src=consul.conf dest=/etc/httpd/conf.d/consul.conf
-  notify: reload apache

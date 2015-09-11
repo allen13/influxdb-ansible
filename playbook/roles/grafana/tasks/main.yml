@@ -1,7 +1,10 @@
-- name: install grafana
-  yum: name=grafana state=latest
+- name: install grafana repo
+  copy: src=grafana.repo dest=/etc/yum.repos.d/grafana.repo
 
-- name: override grafana.ini file
+- name: install grafana
+  yum: name=grafana
+
+- name: install grafana.ini config
   template: src=grafana.ini dest=/etc/grafana/grafana.ini
   notify: restart grafana server
 
