@@ -11,4 +11,4 @@
   notify: restart telegraf
 
 - name: start and enable telegraf
-  service: name=telegraf state=restarted enabled=yes
+  service: name=telegraf state=started enabled=yes
