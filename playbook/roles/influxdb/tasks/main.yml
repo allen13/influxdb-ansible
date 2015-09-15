@@ -18,14 +18,5 @@
     dest: /etc/default/influxdb
   notify: restart influxdb
 
-- name: install influxdb service file
-  template: src=influxdb.service dest=/usr/lib/systemd/system/influxdb.service
-  register: service
-
-- name: reload service files
-  shell: systemctl daemon-reload
-  when: service.changed
-  notify: restart influxdb
-
 - name: start and enable influxdb
   service: name=influxdb state=started enabled=yes

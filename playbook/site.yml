@@ -13,6 +13,7 @@
 - name: influxdb
   hosts: influxdb
   gather_facts: false
+  serial: 1
   sudo: true
   roles:
     - influxdb
