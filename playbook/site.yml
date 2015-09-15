@@ -6,7 +6,6 @@
     - disable-require-tty
     - selinux
     - shared-hosts-file
-    - {role: influxdb-telegraf, tags: telegraf}
   tags:
     - common
 
@@ -19,6 +18,15 @@
     - influxdb
   tags:
     - influxdb
+
+- name: influxdb telegraf
+  hosts: all
+  gather_facts: false
+  sudo: true
+  roles:
+    - influxdb-telegraf
+  tags:
+    - telegraf
 
 - name: grafana
   hosts: grafana
