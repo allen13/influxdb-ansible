@@ -1,0 +1,130 @@
+#!/usr/bin/python
+
+DOCUMENTATION = '''
+---
+module: influxdb_user
+short_description: Adds or removes a user from an InfluxDB database.
+description:
+   - Adds or removes a user from a InfluxDB database.
+options:
+  name:
+    description:
+      - name of the user (role) to add or remove
+    required: true
+  password:
+    description:
+      - set the user's password
+    required: false
+    default: null
+  host:
+    description:
+      - the 'host' part of the InfluxDB username
+    required: false
+    default: localhost
+  login_user:
+    description:
+      - The username used to authenticate with
+    required: false
+    default: null
+  login_password:
+    description:
+      - The password used to authenticate with
+    required: false
+    default: null
+  login_host:
+    description:
+      - Host running the database
+    required: false
+    default: localhost
+  login_port:
+    description:
+      - Port of the InfluxDB server
+    required: false
+    default: 3306
+    version_added: '1.4'
+  login_unix_socket:
+    description:
+      - The path to a Unix domain socket for local connections
+    required: false
+    default: null
+  priv:
+    description:
+      - "InfluxDB privileges string in the format: C(db.table:priv1,priv2)"
+    required: false
+    default: null
+  append_privs:
+    description:
+      - Append the privileges defined by priv to the existing ones for this
+        user instead of overwriting existing ones.
+    required: false
+    choices: [ "yes", "no" ]
+    default: "no"
+    version_added: "1.4"
+  state:
+    description:
+      - Whether the user should exist.  When C(absent), removes
+        the user.
+    required: false
+    default: present
+    choices: [ "present", "absent" ]
+notes:
+   - Requires the influxdb Python package on the remote host: pip install influxdb
+
+requirements: [ "InfluxDBdb" ]
+author: "Mark Theunissen (@marktheunissen)"
+'''
+
+EXAMPLES = """
+# Create admin user
+- influxdb_user: login_url=http://localhost:8086 login_user=admin login_password=admin user=admin password=admin privledges=ALL
+"""
+
+import getpass
+import tempfile
+import re
+try:
+    import InfluxDBdb
+except ImportError:
+    InfluxDBdb_found = False
+else:
+    InfluxDBdb_found = True
+
+# ===========================================
+# Module execution.
+#
+
+def main():
+    module = AnsibleModule(
+        argument_spec = dict(
+            login_user=dict(default=None),
+            login_password=dict(default=None),
+            login_host=dict(default="localhost"),
+            login_port=dict(default=3306, type='int'),
+            login_unix_socket=dict(default=None),
+            user=dict(required=True, aliases=['name']),
+            password=dict(default=None, no_log=True),
+            host=dict(default="localhost"),
+            state=dict(default="present", choices=["absent", "present"]),
+            priv=dict(default=None),
+            append_privs=dict(default=False, type='bool'),
+            update_password=dict(default="always", choices=["always", "on_create"]),
+        )
+    )
+    login_user = module.params["login_user"]
+    login_password = module.params["login_password"]
+    user = module.params["user"]
+    password = module.params["password"]
+    host = module.params["host"].lower()
+    state = module.params["state"]
+    priv = module.params["priv"]
+    check_implicit_admin = module.params['check_implicit_admin']
+    config_file = module.params['config_file']
+    append_privs = module.boolean(module.params["append_privs"])
+    update_password = module.params['update_password']
+
+    module.exit_json(changed=changed, user=user)
+
+# import module snippets
+from ansible.module_utils.basic import *
+if __name__ == '__main__':
+    main()
