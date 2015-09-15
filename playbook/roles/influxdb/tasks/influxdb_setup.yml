@@ -1,0 +1,18 @@
+- name: create influxdb admin user
+  influxdb_user:
+    login_url: "{{ infuxdb_api_url }}"
+    login_user: "{{ influxdb_admin_user }}"
+    login_password: "{{ influxdb_admin_password }}"
+    user: "{{ influxdb_admin_user }}"
+    password: "{{ influxdb_admin_password }}"
+    privledges: ALL
+
+- name: create influxdb telegraf user
+  influxdb_user:
+    login_url: "{{ infuxdb_api_url }}"
+    login_user: "{{ influxdb_admin_user }}"
+    login_password: "{{ influxdb_admin_password }}"
+    user: "{{ influxdb_telegraf_user }}"
+    password: "{{ influxdb_telegraf_password }}"
+    database: telegraf
+    privledges: ALL

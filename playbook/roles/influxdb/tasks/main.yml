@@ -20,3 +20,5 @@
 
 - name: start and enable influxdb
   service: name=influxdb state=started enabled=yes
+
+- include: influxdb_setup.yml

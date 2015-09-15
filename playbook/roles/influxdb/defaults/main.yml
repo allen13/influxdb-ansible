@@ -1,0 +1,7 @@
+infuxdb_api_url: "http://{{ hostvars[groups['influxdb'][0]]['private_ip'] }}:8086"
+
+influxdb_admin_user: admin
+influxdb_admin_password: admin_2015
+
+influxdb_telegraf_user: telegraf
+influxdb_telegraf_password: telegraf_password
