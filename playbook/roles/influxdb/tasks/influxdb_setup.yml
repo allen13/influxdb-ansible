@@ -1,21 +1,27 @@
+- name: get restarts out of the way to ensure master is available for clustering
+  meta: flush_handlers
+
 - name: install influxdb python library
   pip: name=influxdb
 
+- name: wait for influxdb to be started
+  wait_for: host={{ private_ip }} port=8086 timeout=60
+
 - name: create influxdb admin user
   influxdb_user:
-    login_url: "{{ infuxdb_api_url }}"
+    login_host: "{{ influxdb_api_host }}"
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
     user: "{{ influxdb_admin_user }}"
     password: "{{ influxdb_admin_password }}"
-    privledges: ALL
+    privilege: ALL
 
 - name: create influxdb telegraf user
   influxdb_user:
-    login_url: "{{ infuxdb_api_url }}"
+    login_host: "{{ influxdb_api_host }}"
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
     user: "{{ influxdb_telegraf_user }}"
     password: "{{ influxdb_telegraf_password }}"
     database: telegraf
-    privledges: ALL
+    privilege: ALL

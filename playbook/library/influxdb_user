@@ -26,29 +26,28 @@ options:
       - The password used to authenticate with
     required: false
     default: null
-  login_url:
+  login_host:
     description:
       - Host running the database
     required: false
-    default: http://localhost:8086
-  state:
+    default: localhost
+  login_port:
     description:
-      - Whether the user should exist.  When C(absent), removes
-        the user.
+      - Host port running the database
     required: false
-    default: present
-    choices: [ "present", "absent" ]
+    default: 8086
   database:
     description:
-      - Give permissions to this database
+      - Give permissions to this database and create it if it doesn't exist
     required: false
     default: null
-  privledges:
+  privilege:
     description:
       - Level of permissions to grant
     required: false
     default: "ALL"
     choices: [ "ALL", "READ", "WRITE" ]
+
 notes:
    - Requires the influxdb Python package on the remote host: pip install influxdb
 
@@ -58,35 +57,45 @@ author: "Timothy Allen (@allen13)"
 
 EXAMPLES = """
 # Create admin user
-- influxdb_user: login_url=http://localhost:8086 login_user=admin login_password=admin user=admin password=admin privledges=ALL
+- influxdb_user: login_host=localhost login_user=admin login_password=admin user=admin password=admin privilege=ALL
 """
 
 try:
     from influxdb import InfluxDBClient
+    from influxdb.exceptions import InfluxDBClientError
 except ImportError:
     influxdb_found = False
 else:
     influxdb_found = True
 
-def user_exists(client, user):
-    users = user_row["user"] for user_row in client.get_list_users()
-    user in users
+def user_exists(client, user, is_admin):
+    exists = False
+    try:
+        exists = any([user_row["user"] == user for user_row in client.get_list_users()])
+    except InfluxDBClientError as influx_error:
+        if is_admin:
+            return False
+        else:
+            raise influx_error
+    return exists
 
-def create_user(client, user, password, privledges, database):
-    user_exists = user_exists(client, user)
+def database_exists(client, database):
+    any([db_row["name"] == database for db_row in client.get_list_database()])
 
-	if !user_exists:
-        client.create_user(user, password)
+def create_user(client, user, password, privilege, database):
+    is_admin = (privilege == 'ALL' and database == '')
+    exists = user_exists(client, user, is_admin)
 
-        grant_privledges_query = ""
-		if database == "":
-			grant_privledges_query = "GRANT %s TO %s" % (privledges, user)
-		else:
-			grant_privledges_query = "GRANT %s ON %s TO %s" % (privledges, database, user)
+    if not exists:
+        client.create_user(user, password, is_admin)
 
-        client.query(grant_privledges_query)
+        if database != "":
+            if not database_exists(client, database):
+                client.create_database(database)
 
-	return !user_exists
+            client.grant_privilege(privilege, database, user)
+
+    return not exists
 
 def main():
     module = AnsibleModule(
@@ -94,17 +103,16 @@ def main():
             login_user=dict(default=None),
             login_password=dict(default=None),
             login_host=dict(default="localhost"),
-            login_port=dict(default="8086")
+            login_port=dict(default="8086"),
             user=dict(required=True, aliases=['name']),
             password=dict(default=None, required=True, no_log=True),
-            state=dict(default="present", choices=["absent", "present"]),
-            privledges=dict(default=None, choices=["ALL", "READ", "WRITE"]),
-            database=dict(default=""),
+            privilege=dict(default='READ', choices=["ALL", "READ", "WRITE"]),
+            database=dict(default="")
         )
     )
 
     if not influxdb_found:
-        module.fail_json(msg="the python mysqldb module is required")
+        module.fail_json(msg="the python influxdb package is required")
 
     login_user = module.params["login_user"]
     login_password = module.params["login_password"]
@@ -112,12 +120,11 @@ def main():
     login_port = module.params["login_port"]
     user = module.params["user"]
     password = module.params["password"]
-    state = module.params["state"]
-    privledges = module.params["privledges"]
+    privilege = module.params["privilege"]
     database = module.params['database']
 
     client = InfluxDBClient(login_host, login_port, login_user, login_password)
-    user_created = create_user(client, user, password, privledges, database)
+    user_created = create_user(client, user, password, privilege, database)
 
     module.exit_json(changed=user_created)
 
