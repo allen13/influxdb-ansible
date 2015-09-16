@@ -22,3 +22,4 @@
   service: name=influxdb state=started enabled=yes
 
 - include: influxdb_setup.yml
+  when: inventory_hostname == groups['influxdb'][0]

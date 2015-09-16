@@ -1,3 +1,6 @@
+- name: install influxdb python library
+  pip: name=influxdb
+
 - name: create influxdb admin user
   influxdb_user:
     login_url: "{{ infuxdb_api_url }}"

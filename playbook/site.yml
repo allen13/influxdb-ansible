@@ -4,7 +4,7 @@
   sudo: true
   roles:
     - disable-require-tty
-    - selinux
+    - common
     - shared-hosts-file
   tags:
     - common

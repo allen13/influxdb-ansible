@@ -16,11 +16,6 @@ options:
       - set the user's password
     required: false
     default: null
-  host:
-    description:
-      - the 'host' part of the InfluxDB username
-    required: false
-    default: localhost
   login_user:
     description:
       - The username used to authenticate with
@@ -31,35 +26,11 @@ options:
       - The password used to authenticate with
     required: false
     default: null
-  login_host:
+  login_url:
     description:
       - Host running the database
     required: false
-    default: localhost
-  login_port:
-    description:
-      - Port of the InfluxDB server
-    required: false
-    default: 3306
-    version_added: '1.4'
-  login_unix_socket:
-    description:
-      - The path to a Unix domain socket for local connections
-    required: false
-    default: null
-  priv:
-    description:
-      - "InfluxDB privileges string in the format: C(db.table:priv1,priv2)"
-    required: false
-    default: null
-  append_privs:
-    description:
-      - Append the privileges defined by priv to the existing ones for this
-        user instead of overwriting existing ones.
-    required: false
-    choices: [ "yes", "no" ]
-    default: "no"
-    version_added: "1.4"
+    default: http://localhost:8086
   state:
     description:
       - Whether the user should exist.  When C(absent), removes
@@ -67,11 +38,22 @@ options:
     required: false
     default: present
     choices: [ "present", "absent" ]
+  database:
+    description:
+      - Give permissions to this database
+    required: false
+    default: null
+  privledges:
+    description:
+      - Level of permissions to grant
+    required: false
+    default: "ALL"
+    choices: [ "ALL", "READ", "WRITE" ]
 notes:
    - Requires the influxdb Python package on the remote host: pip install influxdb
 
-requirements: [ "InfluxDBdb" ]
-author: "Mark Theunissen (@marktheunissen)"
+requirements: [ "influxdb" ]
+author: "Timothy Allen (@allen13)"
 '''
 
 EXAMPLES = """
@@ -79,19 +61,32 @@ EXAMPLES = """
 - influxdb_user: login_url=http://localhost:8086 login_user=admin login_password=admin user=admin password=admin privledges=ALL
 """
 
-import getpass
-import tempfile
-import re
 try:
-    import InfluxDBdb
+    from influxdb import InfluxDBClient
 except ImportError:
-    InfluxDBdb_found = False
+    influxdb_found = False
 else:
-    InfluxDBdb_found = True
+    influxdb_found = True
 
-# ===========================================
-# Module execution.
-#
+def user_exists(client, user):
+    users = user_row["user"] for user_row in client.get_list_users()
+    user in users
+
+def create_user(client, user, password, privledges, database):
+    user_exists = user_exists(client, user)
+
+	if !user_exists:
+        client.create_user(user, password)
+
+        grant_privledges_query = ""
+		if database == "":
+			grant_privledges_query = "GRANT %s TO %s" % (privledges, user)
+		else:
+			grant_privledges_query = "GRANT %s ON %s TO %s" % (privledges, database, user)
+
+        client.query(grant_privledges_query)
+
+	return !user_exists
 
 def main():
     module = AnsibleModule(
@@ -99,32 +94,33 @@ def main():
             login_user=dict(default=None),
             login_password=dict(default=None),
             login_host=dict(default="localhost"),
-            login_port=dict(default=3306, type='int'),
-            login_unix_socket=dict(default=None),
+            login_port=dict(default="8086")
             user=dict(required=True, aliases=['name']),
-            password=dict(default=None, no_log=True),
-            host=dict(default="localhost"),
+            password=dict(default=None, required=True, no_log=True),
             state=dict(default="present", choices=["absent", "present"]),
-            priv=dict(default=None),
-            append_privs=dict(default=False, type='bool'),
-            update_password=dict(default="always", choices=["always", "on_create"]),
+            privledges=dict(default=None, choices=["ALL", "READ", "WRITE"]),
+            database=dict(default=""),
         )
     )
+
+    if not influxdb_found:
+        module.fail_json(msg="the python mysqldb module is required")
+
     login_user = module.params["login_user"]
     login_password = module.params["login_password"]
+    login_host = module.params["login_host"]
+    login_port = module.params["login_port"]
     user = module.params["user"]
     password = module.params["password"]
-    host = module.params["host"].lower()
     state = module.params["state"]
-    priv = module.params["priv"]
-    check_implicit_admin = module.params['check_implicit_admin']
-    config_file = module.params['config_file']
-    append_privs = module.boolean(module.params["append_privs"])
-    update_password = module.params['update_password']
+    privledges = module.params["privledges"]
+    database = module.params['database']
 
-    module.exit_json(changed=changed, user=user)
+    client = InfluxDBClient(login_host, login_port, login_user, login_password)
+    user_created = create_user(client, user, password, privledges, database)
 
-# import module snippets
+    module.exit_json(changed=user_created)
+
 from ansible.module_utils.basic import *
 if __name__ == '__main__':
     main()
