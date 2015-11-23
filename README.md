@@ -3,11 +3,11 @@ ansible influxdb cluster playbook
 
 ####configuration overview
 
-The goal of this playbook is to make use of InfluxDB as a system metric store.
+The goal of this playbook is to make use of [InfluxDB](https://influxdb.com) as a system metric store.
 Features:
 
 * Can automatically cluster n-number of influxdb nodes
-* Uses telegraf to gather metrics using UDP
+* Uses [Telegraf](https://github.com/influxdb/telegraf) to gather metrics using UDP
 * Sets up a grafana dashboard
 * sets up downsampling for all metrics
 
@@ -20,8 +20,8 @@ apt and yum provided it's done cleanly.
 ####requirements
 
 * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
-* [Vagrant](http://www.vagrantup.com/downloads) on your local machine
-* Ansible via pip install ansible
+* [Vagrant](http://www.vagrantup.com/downloads)
+* [Ansible](http://www.ansible.com) via pip install ansible
 
 ####running in vagrant
 
@@ -34,11 +34,11 @@ apt and yum provided it's done cleanly.
 
 ####Influxdb Admin Site
 
-    http://http://10.0.168.101:8083
+    http://10.0.168.101:8083
 
 ####Grafana Dashboard
 
-    http://http://10.0.168.101:3006
+    http://10.0.168.101:3006
 
 ####custom ansible modules
 
@@ -52,5 +52,5 @@ apt and yum provided it's done cleanly.
 
 ####custom filter plugins
 
-* **to_url_with_port** - assist in building the list of influxdb servers for telegraf
-  to_url_with_port(groups,'influxdb','udp://','private_ip','8089')|join(', ')
+* **to_url_with_port** - assist in building the list of influxdb servers for telegraf.
+	* Example: hostvars|to_url_with_port(groups,'influxdb','udp://','private_ip','8089')|join(', ')
