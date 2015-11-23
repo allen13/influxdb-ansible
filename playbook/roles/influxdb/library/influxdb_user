@@ -45,14 +45,14 @@ options:
     description:
       - Level of permissions to grant
     required: false
-    default: "ALL"
-    choices: [ "ALL", "READ", "WRITE" ]
+    default: 'ALL'
+    choices: [ 'ALL', 'READ', 'WRITE' ]
 
 notes:
    - Requires the influxdb Python package on the remote host: pip install influxdb
 
-requirements: [ "influxdb" ]
-author: "Timothy Allen (@allen13)"
+requirements: [ 'influxdb' ]
+author: 'Timothy Allen (@allen13)'
 '''
 
 EXAMPLES = """
@@ -71,7 +71,7 @@ else:
 def user_exists(client, user, is_admin):
     exists = False
     try:
-        exists = any([user_row["user"] == user for user_row in client.get_list_users()])
+        exists = any([user_row['user'] == user for user_row in client.get_list_users()])
     except InfluxDBClientError as influx_error:
         if is_admin:
             return False
@@ -80,7 +80,7 @@ def user_exists(client, user, is_admin):
     return exists
 
 def database_exists(client, database):
-    any([db_row["name"] == database for db_row in client.get_list_database()])
+    return any([db_row['name'] == database for db_row in client.get_list_database()])
 
 def create_user(client, user, password, privilege, database):
     is_admin = (privilege == 'ALL' and database == '')
@@ -89,10 +89,9 @@ def create_user(client, user, password, privilege, database):
     if not exists:
         client.create_user(user, password, is_admin)
 
-        if database != "":
-            if not database_exists(client, database):
-                client.create_database(database)
-
+    if database != '':
+        if not database_exists(client, database):
+            client.create_database(database)
             client.grant_privilege(privilege, database, user)
 
     return not exists
@@ -102,25 +101,25 @@ def main():
         argument_spec = dict(
             login_user=dict(default=None),
             login_password=dict(default=None),
-            login_host=dict(default="localhost"),
-            login_port=dict(default="8086"),
+            login_host=dict(default='localhost'),
+            login_port=dict(default='8086'),
             user=dict(required=True, aliases=['name']),
             password=dict(default=None, required=True, no_log=True),
-            privilege=dict(default='READ', choices=["ALL", "READ", "WRITE"]),
-            database=dict(default="")
+            privilege=dict(default='READ', choices=['ALL', 'READ', 'WRITE']),
+            database=dict(default='')
         )
     )
 
     if not influxdb_found:
-        module.fail_json(msg="the python influxdb package is required")
+        module.fail_json(msg='the python influxdb package is required')
 
-    login_user = module.params["login_user"]
-    login_password = module.params["login_password"]
-    login_host = module.params["login_host"]
-    login_port = module.params["login_port"]
-    user = module.params["user"]
-    password = module.params["password"]
-    privilege = module.params["privilege"]
+    login_user = module.params['login_user']
+    login_password = module.params['login_password']
+    login_host = module.params['login_host']
+    login_port = module.params['login_port']
+    user = module.params['user']
+    password = module.params['password']
+    privilege = module.params['privilege']
     database = module.params['database']
 
     client = InfluxDBClient(login_host, login_port, login_user, login_password)

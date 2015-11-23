@@ -26,5 +26,9 @@ def create_vm(config, options = {})
       vb.memory = memory
       vb.cpus = cpus
     end
+
+    config.vm.provision "shell", inline: "setenforce 0"
+    config.vm.provision "shell", inline: "exec sed -i 's/Defaults.*requiretty//' /etc/sudoers"
+    config.vm.provision "shell", inline: "sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux && cat /etc/sysconfig/selinux"
   end
 end

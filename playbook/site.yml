@@ -1,14 +1,3 @@
-- name: all
-  hosts: all
-  gather_facts: false
-  sudo: true
-  roles:
-    - disable-require-tty
-    - common
-    - shared-hosts-file
-  tags:
-    - common
-
 - name: influxdb
   hosts: influxdb
   gather_facts: false

@@ -1,15 +1,15 @@
 - name: download influxdb
   get_url:
-    url: https://s3.amazonaws.com/influxdb/influxdb-0.9.3-1.x86_64.rpm
+    url: https://s3.amazonaws.com/influxdb/influxdb-{{ influxdb_version }}-1.x86_64.rpm
     dest: /opt/
 
 - name: install influxdb
-  yum: name=/opt/influxdb-0.9.3-1.x86_64.rpm
+  yum: name=/opt/influxdb-{{ influxdb_version }}-1.x86_64.rpm
 
 - name: setup influxdb config
   template:
     src: influxdb.conf
-    dest: /etc/opt/influxdb/influxdb.conf
+    dest: /etc/influxdb/influxdb.conf
   notify: restart influxdb
 
 - name: setup influxdb environment file
@@ -17,6 +17,10 @@
     src: influxdb_env
     dest: /etc/default/influxdb
   notify: restart influxdb
+
+- name: wait for influxdb leader to start
+  wait_for: host={{ influxdb_leader_ip }} port=8088 timeout=60
+  when: inventory_hostname != groups['influxdb'][0]
 
 - name: start and enable influxdb
   service: name=influxdb state=started enabled=yes

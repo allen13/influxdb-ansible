@@ -1,6 +1,12 @@
 - name: get restarts out of the way to ensure master is available for clustering
   meta: flush_handlers
 
+- name: enable EPEL repos
+  yum: name=epel-release
+
+- name: install python pip
+  yum: name=python-pip
+
 - name: install influxdb python library
   pip: name=influxdb
 
@@ -25,3 +31,24 @@
     password: "{{ influxdb_telegraf_password }}"
     database: telegraf
     privilege: ALL
+
+- name: create retention policies
+  influxdb_retention_policy:
+    login_host: "{{ influxdb_api_host }}"
+    login_user: "{{ influxdb_admin_user }}"
+    login_password: "{{ influxdb_admin_password }}"
+    database: telegraf
+    duration: "{{ item.duration }}"
+    replication: "{{ item.replication }}"
+    is_default_policy: "{{ item.default | default(false) }}"
+  with_items: "{{ influxdb_retention_policies }}"
+
+- name: create downsamplings for influxdb measurements
+  influxdb_downsample:
+    login_host: "{{ influxdb_api_host }}"
+    login_user: "{{ influxdb_admin_user }}"
+    login_password: "{{ influxdb_admin_password }}"
+    database: telegraf
+    retentions: 5m:rp_60d,30m:rp_52w
+    measurements: "{{ influxdb_measurements_to_downsample }}"
+    prune: true

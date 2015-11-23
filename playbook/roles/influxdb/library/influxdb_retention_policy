@@ -1,0 +1,165 @@
+#!/usr/bin/python
+
+DOCUMENTATION = '''
+---
+module: influxdb_retention_policy
+short_description: Adds/Alters retention policies on databases
+description:
+   - Adds or removes a user from a InfluxDB database.
+options:
+  login_user:
+    description:
+      - The username used to authenticate with
+    required: false
+    default: null
+  login_password:
+    description:
+      - The password used to authenticate with
+    required: false
+    default: null
+  login_host:
+    description:
+      - Host running the database
+    required: false
+    default: localhost
+  login_port:
+    description:
+      - Host port running the database
+    required: false
+    default: 8086
+  name:
+    description:
+      - Retention policy name
+    required: False
+    default: "rp_(duration)"
+  database:
+    description:
+      - Give permissions to this database
+    default: None
+    required: false
+  duration:
+    description:
+      - How long the policy will keep data
+    required: true
+  replication:
+    description:
+      - How many nodes the policy will replicate the data to
+    required: false
+    default: 1
+  is_default_policy:
+    description:
+      - Set policy as the default
+    required: false
+    default: False
+
+notes:
+   - Requires the influxdb Python package on the remote host: pip install influxdb
+
+requirements: [ 'influxdb' ]
+author: 'Timothy Allen (@allen13)'
+'''
+
+EXAMPLES = """
+# Create admin user
+- influxdb_retention_policy: login_user=admin login_password=admin database=telegraf duration=60d replication=2
+"""
+
+try:
+    from influxdb import InfluxDBClient
+    from influxdb.exceptions import InfluxDBClientError
+except ImportError:
+    influxdb_found = False
+else:
+    influxdb_found = True
+
+
+class InfluxDBRetentionPolicy:
+
+    def __init__(self, module):
+        params = module.params
+
+        self.client = InfluxDBClient(
+            params['login_host'],
+            params['login_port'],
+            params['login_user'],
+            params['login_password'])
+
+        self.name = params['name']
+        self.database = params['database']
+        self.duration = params['duration']
+        self.replication = int(params['replication'])
+        self.is_default_policy = module.boolean(params['is_default_policy'])
+        if self.name is None:
+            self.name = "rp_%s" % self.duration
+
+        self.retention_policies = []
+
+        self.module = module
+
+    def policy_equivalent(self, policy):
+        return (policy['default'] == self.is_default_policy and
+                policy['name'] == self.name and
+                policy['replicaN'] == self.replication)
+
+    def list_retention_policies(self):
+        if len(self.retention_policies) > 0:
+            return self.retention_policies
+        else:
+            self.retention_policies = self.client.get_list_retention_policies(self.database)
+            return self.retention_policies
+
+    def retention_policy_matches(self):
+        return any([self.policy_equivalent(policy)
+                    for policy in self.list_retention_policies()])
+
+    def retention_policy_exists(self):
+        return any([policy['name'] == self.name
+                    for policy in self.list_retention_policies()])
+
+    def update_or_create_policy(self):
+        if self.retention_policy_exists():
+            if self.retention_policy_matches():
+                return False
+            else:
+                self.client.alter_retention_policy(
+                    self.name,
+                    self.database,
+                    self.duration,
+                    self.replication,
+                    self.is_default_policy)
+                return True
+        else:
+            self.client.create_retention_policy(
+                self.name,
+                self.duration,
+                self.replication,
+                self.database,
+                self.is_default_policy)
+            return True
+
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            login_user=dict(required=True),
+            login_password=dict(required=True),
+            login_host=dict(default='localhost'),
+            login_port=dict(default='8086'),
+            name=dict(default=None),
+            database=dict(default=None),
+            duration=dict(required=True),
+            replication=dict(default=1),
+            is_default_policy=dict(default=False)
+        )
+    )
+
+    if not influxdb_found:
+        module.fail_json(msg='the python influxdb package is required')
+
+    policy_updated_or_created = InfluxDBRetentionPolicy(module).update_or_create_policy()
+
+    module.exit_json(changed=policy_updated_or_created)
+
+from ansible.module_utils.basic import *
+if __name__ == '__main__':
+    main()

@@ -1,5 +1,0 @@
-- lineinfile:
-    dest: /etc/sudoers
-    regexp: '.*Defaults\s*requiretty'
-    line: '#Defaults    requiretty'
-    validate: 'visudo -cf %s'

@@ -1,3 +1,4 @@
+influxdb_telegraf_version: 0.2.2
 influxdb_telegraf_db: telegraf
 influxdb_telegraf_user: telegraf
 influxdb_telegraf_password: telegraf_password

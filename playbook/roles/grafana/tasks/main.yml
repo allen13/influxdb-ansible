@@ -2,7 +2,8 @@
   copy: src=grafana.repo dest=/etc/yum.repos.d/grafana.repo
 
 - name: install grafana
-  yum: name=grafana
+  yum: name=grafana state=latest
+  notify: restart grafana server
 
 - name: install grafana.ini config
   template: src=grafana.ini dest=/etc/grafana/grafana.ini
