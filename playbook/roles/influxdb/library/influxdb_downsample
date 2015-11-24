@@ -162,7 +162,7 @@ class InfluxDBDownsample:
             else:
                 if not self.continuous_query_matches(
                         aggregate_measurment, continuous_query):
-                    self.drop_continuous_query(measurement, aggregate_measurment)
+                    self.drop_continuous_query(aggregate_measurment)
                     self.client.query(continuous_query)
                     changed = True
 
