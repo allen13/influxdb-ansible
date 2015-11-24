@@ -68,33 +68,64 @@ except ImportError:
 else:
     influxdb_found = True
 
-def user_exists(client, user, is_admin):
-    exists = False
-    try:
-        exists = any([user_row['user'] == user for user_row in client.get_list_users()])
-    except InfluxDBClientError as influx_error:
-        if is_admin:
-            return False
-        else:
-            raise influx_error
-    return exists
 
-def database_exists(client, database):
-    return any([db_row['name'] == database for db_row in client.get_list_database()])
+class InfluxdbUser:
 
-def create_user(client, user, password, privilege, database):
-    is_admin = (privilege == 'ALL' and database == '')
-    exists = user_exists(client, user, is_admin)
+    def __init__(self, module):
+        self.module = module
+        self.login_user = module.params['login_user']
+        self.login_password = module.params['login_password']
+        self.login_host = module.params['login_host']
+        self.login_port = module.params['login_port']
+        self.user = module.params['user']
+        self.password = module.params['password']
+        self.privilege = module.params['privilege']
+        self.database = module.params['database']
 
-    if not exists:
-        client.create_user(user, password, is_admin)
+        self.client = InfluxDBClient(self.login_host, self.login_port, self.login_user, self.login_password)
 
-    if database != '':
-        if not database_exists(client, database):
-            client.create_database(database)
-            client.grant_privilege(privilege, database, user)
+    def is_user_admin(self):
+        return self.privilege == 'ALL' and self.database == ''
 
-    return not exists
+    def user_exists(self):
+        try:
+            return any([user_row['user'] == self.user for user_row in self.client.get_list_users()])
+        except InfluxDBClientError as influx_error: #influxdb will throw an error if no admin user exists
+            if self.is_user_admin():
+                return False #admin user has not been created yet
+            else:
+                raise influx_error
+
+    def database_exists(self):
+        return any([db_row['name'] == self.database for db_row in self.client.get_list_database()])
+
+    def query_user_grants(self):
+        show_grants_query = "SHOW GRANTS FOR {0}".format(self.user)
+        return list(self.client.query(show_grants_query)['results'])
+
+    def grants_match(self):
+        privilege_string = self.privilege + " PRIVILEGES"
+        return any([(grant['database'] == self.database and grant['privilege'] == privilege_string)
+                    for grant in self.query_user_grants()])
+
+    def maintain_user(self):
+        changed = False
+
+        if not self.user_exists():
+            self.client.create_user(self.user, self.password, self.is_user_admin())
+            changed = True
+
+        if self.database != '':
+            if not self.database_exists():
+                self.client.create_database(self.database)
+                self.client.grant_privilege(self.privilege, self.database, self.user)
+                changed = True
+            else:
+                if not self.grants_match():
+                    self.client.grant_privilege(self.privilege, self.database, self.user)
+                    changed = True
+
+        return changed
 
 def main():
     module = AnsibleModule(
@@ -113,19 +144,9 @@ def main():
     if not influxdb_found:
         module.fail_json(msg='the python influxdb package is required')
 
-    login_user = module.params['login_user']
-    login_password = module.params['login_password']
-    login_host = module.params['login_host']
-    login_port = module.params['login_port']
-    user = module.params['user']
-    password = module.params['password']
-    privilege = module.params['privilege']
-    database = module.params['database']
+    user_created_or_updated = InfluxdbUser(module).maintain_user()
 
-    client = InfluxDBClient(login_host, login_port, login_user, login_password)
-    user_created = create_user(client, user, password, privilege, database)
-
-    module.exit_json(changed=user_created)
+    module.exit_json(changed=user_created_or_updated)
 
 from ansible.module_utils.basic import *
 if __name__ == '__main__':
