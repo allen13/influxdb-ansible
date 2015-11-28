@@ -7,9 +7,6 @@ influxdb-03 ansible_ssh_host=10.0.168.103 private_ip=10.0.169.103
 ansible_ssh_user=vagrant
 ansible_ssh_pass=vagrant
 
-[consul]
-influxdb-01
-
 [influxdb]
 influxdb-0[1:3]
 
