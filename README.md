@@ -9,7 +9,7 @@ Features:
 * Can automatically cluster n-number of influxdb nodes
 * Uses [Telegraf](https://github.com/influxdb/telegraf) to gather metrics using UDP
 * Sets up a grafana dashboard
-* sets up downsampling for all metrics
+* Sets up downsampling for all metrics
 
 ####notes
 
@@ -32,11 +32,11 @@ apt and yum provided it's done cleanly.
 
     bin/destroy
 
-####Influxdb Admin Site
+####influxdb admin site
 
     http://10.0.168.101:8083
 
-####Grafana Dashboard
+####grafana dashboard
 
     http://10.0.168.101:3006
 
