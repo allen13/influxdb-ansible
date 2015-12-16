@@ -8,6 +8,7 @@ Features:
 
 * Can automatically cluster n-number of influxdb nodes
 * Uses [Telegraf](https://github.com/influxdb/telegraf) to gather metrics using UDP
+* Sets up [Kapacitor](https://github.com/influxdb/kapacitor) for processing, monitoring, and alerting
 * Sets up a grafana dashboard
 * Sets up downsampling for all metrics
 

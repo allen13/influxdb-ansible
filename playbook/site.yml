@@ -17,6 +17,15 @@
   tags:
     - telegraf
 
+- name: influxdb kapacitor
+  hosts: kapacitor
+  gather_facts: false
+  sudo: true
+  roles:
+    - influxdb-kapacitor
+  tags:
+    - kapacitor
+
 - name: grafana
   hosts: grafana
   gather_facts: false
