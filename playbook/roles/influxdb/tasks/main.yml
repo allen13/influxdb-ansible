@@ -1,10 +1,5 @@
-- name: download influxdb
-  get_url:
-    url: https://s3.amazonaws.com/influxdb/influxdb-{{ influxdb_version }}-1.x86_64.rpm
-    dest: /opt/
-
 - name: install influxdb
-  yum: name=/opt/influxdb-{{ influxdb_version }}-1.x86_64.rpm
+  yum: name=influxdb state=latest
 
 - name: setup influxdb config
   template:

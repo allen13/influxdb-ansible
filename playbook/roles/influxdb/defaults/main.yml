@@ -1,4 +1,3 @@
-influxdb_version: 0.9.6
 influxdb_admin_user: admin
 influxdb_admin_password: admin
 influxdb_leader_ip: "{{ hostvars[groups['influxdb'][0]]['private_ip'] }}"

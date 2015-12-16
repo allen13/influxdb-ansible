@@ -1,10 +1,5 @@
-- name: download influxdb telegraf
-  get_url:
-    url: http://get.influxdb.org/telegraf/telegraf-{{ influxdb_telegraf_version }}-1.x86_64.rpm
-    dest: /opt/
-
 - name: install influxdb telegraf
-  yum: name=/opt/telegraf-{{ influxdb_telegraf_version }}-1.x86_64.rpm
+  yum: name=telegraf state=latest
 
 - name: install telegraf setup
   template: src=telegraf.conf dest=/etc/opt/telegraf/telegraf.conf
