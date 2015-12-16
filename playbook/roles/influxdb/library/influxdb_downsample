@@ -106,7 +106,7 @@ class InfluxDBDownsample:
         database = self.database
         default_policy_name = self.get_default_policy_name()
 
-        return "CREATE CONTINUOUS QUERY %(aggregate_measurment)s ON %(database)s BEGIN SELECT mean(value) AS \"value\" INTO \"%(database)s\".\"%(retention_policy)s\".%(aggregate_measurment)s FROM \"%(database)s\".\"%(default_policy_name)s\".%(measurement)s GROUP BY time(%(time_aggregate)s), * END" % locals()
+        return "CREATE CONTINUOUS QUERY %(aggregate_measurment)s ON %(database)s BEGIN SELECT mean(value) AS \"value\" INTO %(database)s.%(retention_policy)s.%(aggregate_measurment)s FROM %(database)s.%(default_policy_name)s.%(measurement)s GROUP BY time(%(time_aggregate)s), * END" % locals()
 
     def query_existing_continous_queries(self):
         return list(self.client.query("SHOW CONTINUOUS QUERIES")[self.database])
