@@ -1,5 +1,10 @@
-- name: install influxdb telegraf
+- name: install influxdb telegraf on RedHat
   yum: name=telegraf state=latest
+  when: ansible_os_family == 'RedHat'
+
+- name: install influxdb telegraf on Debian
+  apt: name=telegraf state=latest
+  when: ansible_os_family == 'Debian'
 
 - name: install telegraf setup
   template: src=telegraf.conf dest=/etc/opt/telegraf/telegraf.conf

@@ -1,2 +1,6 @@
-- name: setup influxdb repository
-  copy: src=influxdb.repo dest=/etc/yum.repos.d/influxdb.repo
+---
+- include: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+- include: Debian.yml
+  when: ansible_os_family == 'Debian'
