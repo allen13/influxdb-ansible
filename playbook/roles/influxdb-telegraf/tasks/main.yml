@@ -2,7 +2,7 @@
   yum: name=telegraf state=latest
 
 - name: install telegraf setup
-  template: src=telegraf.conf dest=/etc/opt/telegraf/telegraf.conf
+  template: src=telegraf.conf dest=/etc/telegraf/telegraf.conf
   notify: restart telegraf
 
 - name: start and enable telegraf
