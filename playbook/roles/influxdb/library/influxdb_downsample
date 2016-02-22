@@ -44,7 +44,7 @@ options:
     required: true
   prune:
     description:
-      - remove all continous queries not created by this module
+      - remove all continuous queries not created by this module
     default: false
     required: false
   state:
@@ -63,7 +63,7 @@ author: 'Timothy Allen (@allen13)'
 
 EXAMPLES = """
 # downsample system_load1
-- influxdb_downsample: login_user=admin login_password=admin database=telegraf retentions=30s:60d,1m:52w measurements=[system_load1]
+- influxdb_downsample: login_user=admin login_password=admin database=telegraf retentions=30s:60d,1m:52w measurements=[{'measurement':'system', 'fields': ['load1']}]
 """
 
 try:
@@ -102,11 +102,17 @@ class InfluxDBDownsample:
                             if policy['default'] == True][0]
         return default_policy['name']
 
+    def build_downsampled_fields(self, fields):
+        downsampled_fields = map(lambda field: "mean(%(field)s) AS %(field)s" % locals(), fields)
+        return ', '.join(downsampled_fields)
+
     def continuous_query_template(self, measurement, aggregate_measurment, time_aggregate, retention_policy):
         database = self.database
         default_policy_name = self.get_default_policy_name()
+        downsampled_fields = self.build_downsampled_fields(measurement['fields'])
+        measurement_name = measurement['measurement']
 
-        return "CREATE CONTINUOUS QUERY %(aggregate_measurment)s ON %(database)s BEGIN SELECT mean(value) AS \"value\" INTO %(database)s.%(retention_policy)s.%(aggregate_measurment)s FROM %(database)s.%(default_policy_name)s.%(measurement)s GROUP BY time(%(time_aggregate)s), * END" % locals()
+        return "CREATE CONTINUOUS QUERY %(aggregate_measurment)s ON %(database)s BEGIN SELECT %(downsampled_fields)s INTO %(database)s.%(retention_policy)s.%(aggregate_measurment)s FROM %(database)s.%(default_policy_name)s.%(measurement_name)s GROUP BY time(%(time_aggregate)s), * END" % locals()
 
     def query_existing_continous_queries(self):
         return list(self.client.query("SHOW CONTINUOUS QUERIES")[self.database])
@@ -152,7 +158,7 @@ class InfluxDBDownsample:
         for retention in self.retentions:
             time_aggregate = retention[0]
             retention_policy = retention[1]
-            aggregate_measurment = '%s_%s' % (measurement, time_aggregate)
+            aggregate_measurment = '%s_%s' % (measurement['measurement'], time_aggregate)
 
             continuous_query = self.continuous_query_template(measurement, aggregate_measurment, time_aggregate, retention_policy)
 
@@ -173,7 +179,7 @@ class InfluxDBDownsample:
         for measurement in self.measurements:
             for retention in self.retentions:
                 time_aggregate = retention[0]
-                aggregate_measurment = '%s_%s' % (measurement, time_aggregate)
+                aggregate_measurment = '%s_%s' % (measurement['measurement'], time_aggregate)
                 continous_query_names.append(aggregate_measurment)
 
         return continous_query_names

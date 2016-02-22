@@ -14,9 +14,15 @@ Features:
 
 ####notes
 
+* All of the packages in this repo are set to state=latest so that I don't have
+to continuously maintain the version pin.
+If you intend to use this in production you should pin all of the versions and
+do testing between upgrades.
+Additionally the influxdb modules make a lot of assumptions about the way influx
+does things and are vulnerable to being broken between versions.
+
 * This playbook is specific to Centos7 and there is no intent to generalize it to
-other distros. I am willing to accept pull requests that make this work with
-apt and yum provided it's done cleanly.
+other distros, but it should provide a good enough example to get going in any environment.
 
 ####requirements
 
@@ -45,11 +51,10 @@ apt and yum provided it's done cleanly.
 
 * **influxdb_user** - create users for Influxdb
 * **influxdb_retention_policy** - create retention policies for Influxdb
-* **influxdb_downsample** - given measurements of [system_load1, mem_available]
+* **influxdb_downsample** - given measurements [{'measurement':'system', 'fields':['load1','load5','load15']]
    and retention policy 30s:30d,1m:52w continuous queries will be generated
    that downsample the metrics accordingly. The naming scheme
-   will generate continuous queries system_load1_30s with assigned retention policy rp_30d and
-   system_load1_1m with assigned retention policy rp_52w.
+   will generate the continuous query system_30s with assigned retention policy rp_30d.
 
 ####custom filter plugins
 

@@ -50,5 +50,5 @@
     login_password: "{{ influxdb_admin_password }}"
     database: telegraf
     retentions: 5m:rp_60d,30m:rp_52w
-    measurements: "{{ influxdb_measurements_to_downsample }}"
+    measurements: "{{ influxdb_measurement_fields_to_downsample_on_mean }}"
     prune: true
