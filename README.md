@@ -21,9 +21,6 @@ do testing between upgrades.
 Additionally the influxdb modules make a lot of assumptions about the way influx
 does things and are vulnerable to being broken between versions.
 
-* This playbook is specific to Centos7 and there is no intent to generalize it to
-other distros, but it should provide a good enough example to get going in any environment.
-
 ####requirements
 
 * [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
