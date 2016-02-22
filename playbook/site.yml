@@ -1,6 +1,6 @@
 - name: influxdb
   hosts: influxdb
-  gather_facts: false
+  gather_facts: true
   serial: 1
   sudo: true
   roles:
@@ -10,7 +10,7 @@
 
 - name: influxdb telegraf
   hosts: all
-  gather_facts: false
+  gather_facts: true
   sudo: true
   roles:
     - influxdb-telegraf
@@ -19,7 +19,7 @@
 
 - name: influxdb kapacitor
   hosts: kapacitor
-  gather_facts: false
+  gather_facts: true
   sudo: true
   roles:
     - influxdb-kapacitor
@@ -28,7 +28,7 @@
 
 - name: grafana
   hosts: grafana
-  gather_facts: false
+  gather_facts: true
   sudo: true
   roles:
     - grafana

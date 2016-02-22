@@ -3,3 +3,4 @@
 *.vdi
 *.pyc
 **/.*.swp
+.bundle
