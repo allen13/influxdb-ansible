@@ -1,8 +1,5 @@
-require 'rbconfig'
-
 def create_vm(config, options = {})
   dirname = File.dirname(__FILE__)
-  config.vm.synced_folder "#{dirname}/..", '/vagrant', disabled: false
   config.ssh.password = 'vagrant'
 
   name = options.fetch(:name, "node")
@@ -13,7 +10,7 @@ def create_vm(config, options = {})
   cpus = options.fetch(:cpus, 1)
 
   config.vm.define vm_name do |config|
-    config.vm.box = "bento/centos-7.1"
+    config.vm.box = "centos/7"
     config.vm.hostname = vm_name
 
     public_ip = "10.0.168.10#{id}"

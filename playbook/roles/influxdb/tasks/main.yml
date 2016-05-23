@@ -7,18 +7,7 @@
     dest: /etc/influxdb/influxdb.conf
   notify: restart influxdb
 
-- name: setup influxdb environment file
-  template:
-    src: influxdb_env
-    dest: /etc/default/influxdb
-  notify: restart influxdb
-
-- name: wait for influxdb leader to start
-  wait_for: host={{ influxdb_leader_ip }} port=8088 timeout=60
-  when: inventory_hostname != groups['influxdb'][0]
-
 - name: start and enable influxdb
   service: name=influxdb state=started enabled=yes
 
 - include: influxdb_setup.yml
-  when: inventory_hostname == groups['influxdb'][0]

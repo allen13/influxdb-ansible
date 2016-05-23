@@ -1,13 +1,5 @@
-from ansible import errors, runner
-import json
 
 def to_url_with_port(host_vars, groups, target, endpoint_type ,attribute, port):
-    if type(host_vars) != runner.HostVars:
-        raise errors.AnsibleFilterError("|failed expects a HostVars")
-
-    if type(groups) != dict:
-        raise errors.AnsibleFilterError("|failed expects a Dictionary")
-
     hosts_in_group = []
     for host in groups[target]:
         hosts_in_group.append(host_vars[host])
