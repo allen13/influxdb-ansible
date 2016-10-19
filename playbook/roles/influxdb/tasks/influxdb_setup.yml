@@ -24,8 +24,8 @@
     login_host: "{{ influxdb_api_host }}"
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
-    user: "{{ influxdb_telegraf_user }}"
-    password: "{{ influxdb_telegraf_password }}"
+    user: "{{ influxdb_metrics_db_user }}"
+    password: "{{ influxdb_metrics_db_password }}"
     database: telegraf
     privilege: ALL
 
