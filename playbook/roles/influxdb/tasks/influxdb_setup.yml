@@ -47,6 +47,6 @@
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
     database: telegraf
-    retentions: 5m:rp_60d,30m:rp_52w
+    retentions: "{{ influxdb_retentions }}"
     measurements: "{{ influxdb_measurement_fields_to_downsample_on_mean }}"
     prune: true
