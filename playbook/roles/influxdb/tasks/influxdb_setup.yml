@@ -1,6 +1,3 @@
-- name: get restarts out of the way to ensure master is available for clustering
-  meta: flush_handlers
-
 - name: enable EPEL repos
   yum: name=epel-release
 
@@ -34,13 +31,14 @@
 
 - name: create retention policies
   influxdb_retention_policy:
-    login_host: "{{ influxdb_api_host }}"
-    login_user: "{{ influxdb_admin_user }}"
-    login_password: "{{ influxdb_admin_password }}"
-    database: telegraf
+    hostname: "{{ influxdb_api_host }}"
+    username: "{{ influxdb_admin_user }}"
+    password: "{{ influxdb_admin_password }}"
+    database_name: telegraf
+    policy_name: "{{ item.name }}"
     duration: "{{ item.duration }}"
     replication: "{{ item.replication }}"
-    is_default_policy: "{{ item.default | default(false) }}"
+    default: "{{ item.default | default(false) }}"
   with_items: "{{ influxdb_retention_policies }}"
 
 - name: create downsamplings for influxdb measurements

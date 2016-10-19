@@ -1,5 +1,0 @@
-- name: install apt key
-  apt_key: url=https://repos.influxdata.com/influxdb.key state=present
-
-- name: enable influx repo
-  apt_repository: repo="deb http://repos.influxdata.com/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable"

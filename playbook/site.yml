@@ -8,7 +8,7 @@
     - influxdb
 
 - name: influxdb telegraf
-  hosts: all
+  hosts: telegraf
   gather_facts: true
   become: true
   roles:

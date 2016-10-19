@@ -1,5 +1,6 @@
 - name: install influxdb kapacitor
   yum: name=kapacitor state=latest
+  notify: restart kapacitor
 
 - name: setup kapacitor config
   template: src=kapacitor.conf dest=/etc/kapacitor/kapacitor.conf

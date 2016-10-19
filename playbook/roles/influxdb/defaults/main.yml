@@ -1,4 +1,6 @@
 influxdb_leader_ip: "{{ hostvars[groups['influxdb'][0]]['private_ip'] }}"
+influxdb_continuous_queries_log_enabled: "false"
+influxdb_http_log_enabled: "false"
 
 influxdb_retention_policies:
   - name: rp_7d

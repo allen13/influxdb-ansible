@@ -1,11 +1,13 @@
 [development]
-influxdb-01 ansible_ssh_host=10.0.168.101 private_ip=10.0.169.101
+influxdb-01 ansible_ssh_host=192.0.2.111 private_ip=192.0.2.111 public_ip=192.0.2.211 ansible_ssh_private_key_file=.vagrant/machines/influxdb-01/virtualbox/private_key
 
 [development:vars]
 ansible_ssh_user=vagrant
-ansible_ssh_pass=vagrant
 
 [influxdb]
+influxdb-01
+
+[telegraf]
 influxdb-01
 
 [kapacitor]

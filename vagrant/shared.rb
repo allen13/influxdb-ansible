@@ -1,6 +1,5 @@
 def create_vm(config, options = {})
   dirname = File.dirname(__FILE__)
-  config.ssh.password = 'vagrant'
 
   name = options.fetch(:name, "node")
   id = options.fetch(:id, 1)
@@ -13,19 +12,15 @@ def create_vm(config, options = {})
     config.vm.box = "centos/7"
     config.vm.hostname = vm_name
 
-    public_ip = "10.0.168.10#{id}"
-    config.vm.network :private_network, ip: public_ip, netmask: "255.255.255.0"
+    private_ip = "192.0.2.11#{id}"
+    config.vm.network :private_network, ip: private_ip, netmask: "255.255.255.128"
 
-    private_ip = "10.0.169.10#{id}"
-    config.vm.network :private_network, ip: private_ip, netmask: "255.255.255.0"
+    public_ip = "192.0.2.21#{id}"
+    config.vm.network :private_network, ip: public_ip, netmask: "255.255.255.128"
 
     config.vm.provider :virtualbox do |vb|
       vb.memory = memory
       vb.cpus = cpus
     end
-
-    config.vm.provision "shell", inline: "setenforce 0"
-    config.vm.provision "shell", inline: "exec sed -i 's/Defaults.*requiretty//' /etc/sudoers"
-    config.vm.provision "shell", inline: "sed -i 's/^SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux && cat /etc/sysconfig/selinux"
   end
 end

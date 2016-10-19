@@ -1,1 +1,2 @@
-- include: "{{ ansible_os_family }}.yml"
+- name: setup influxdb repository
+  copy: src=influxdb.repo dest=/etc/yum.repos.d/influxdb.repo
