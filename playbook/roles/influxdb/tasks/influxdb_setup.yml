@@ -12,29 +12,29 @@
 
 - name: create influxdb admin user
   influxdb_user:
-    login_host: "{{ influxdb_api_host }}"
+    login_host: "{{ private_ip }}"
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
     user: "{{ influxdb_admin_user }}"
     password: "{{ influxdb_admin_password }}"
     privilege: ALL
 
-- name: create influxdb telegraf user
+- name: create influxdb {{ influxdb_metrics_db }} user
   influxdb_user:
-    login_host: "{{ influxdb_api_host }}"
+    login_host: "{{ private_ip }}"
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
     user: "{{ influxdb_metrics_db_user }}"
     password: "{{ influxdb_metrics_db_password }}"
-    database: telegraf
+    database: "{{ influxdb_metrics_db }}"
     privilege: ALL
 
 - name: create retention policies
   influxdb_retention_policy:
-    hostname: "{{ influxdb_api_host }}"
+    hostname: "{{ private_ip }}"
     username: "{{ influxdb_admin_user }}"
     password: "{{ influxdb_admin_password }}"
-    database_name: telegraf
+    database_name: "{{ influxdb_metrics_db }}"
     policy_name: "{{ item.name }}"
     duration: "{{ item.duration }}"
     replication: "{{ item.replication }}"
@@ -43,10 +43,10 @@
 
 - name: create downsamplings for influxdb measurements
   influxdb_downsample:
-    login_host: "{{ influxdb_api_host }}"
+    login_host: "{{ private_ip }}"
     login_user: "{{ influxdb_admin_user }}"
     login_password: "{{ influxdb_admin_password }}"
-    database: telegraf
+    database: "{{ influxdb_metrics_db }}"
     retentions: "{{ influxdb_retentions }}"
     measurements: "{{ influxdb_measurement_fields_to_downsample_on_mean }}"
     prune: true

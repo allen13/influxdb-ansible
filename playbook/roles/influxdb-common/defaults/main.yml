@@ -4,6 +4,8 @@ influxdb_api_url: http://{{ influxdb_api_host }}:8086
 influxdb_admin_user: admin
 influxdb_admin_password: admin
 
+influxdb_default_retention_policy: rp_7d
+
 influxdb_metrics_db: metrics
 influxdb_metrics_db_user: metrics
 influxdb_metrics_db_password: metrics
