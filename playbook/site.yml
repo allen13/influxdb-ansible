@@ -7,6 +7,15 @@
   tags:
     - influxdb
 
+- name: influxdb-relay
+  hosts: influxdb-relay
+  gather_facts: true
+  become: true
+  roles:
+    - influxdb-relay
+  tags:
+    - influxdb-relay
+
 - name: influxdb telegraf
   hosts: telegraf
   gather_facts: true

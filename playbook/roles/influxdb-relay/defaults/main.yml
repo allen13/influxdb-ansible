@@ -1,0 +1,7 @@
+influxdb_relay_version: 0.1.0
+
+influxdb_relay_outputs:
+  - name: influxdb
+    url: http://localhost:8086/write
+  - name: kapacitor
+    url: http://localhost:9092/write

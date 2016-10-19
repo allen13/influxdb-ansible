@@ -1,0 +1,12 @@
+- name: install influxdb relay
+  yum:
+    name: https://github.com/allen13/influxdb-relay/releases/download/{{ influxdb_relay_version }}/influxdb-relay-{{ influxdb_relay_version }}.x86_64.rpm
+    state: present
+  notify: restart influxdb-relay
+
+- name: setup influxdb relay config
+  template: src=influxdb-relay.conf dest=/etc/influxdb-relay/influxdb-relay.conf
+  notify: restart influxdb-relay
+
+- name: start and enable influxdb-relay
+  service: name=influxdb-relay state=started enabled=yes

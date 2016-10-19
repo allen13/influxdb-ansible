@@ -7,6 +7,9 @@ ansible_ssh_user=vagrant
 [influxdb]
 influxdb-01
 
+[influxdb-relay]
+influxdb-01
+
 [telegraf]
 influxdb-01
 
