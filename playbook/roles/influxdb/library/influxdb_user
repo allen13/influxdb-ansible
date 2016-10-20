@@ -115,6 +115,10 @@ class InfluxdbUser:
             self.client.create_user(self.user, self.password, self.is_user_admin())
             changed = True
 
+        if not self.is_user_password_valid() and not self.is_user_admin():
+            self.client.set_user_password(self.user, self.password)
+            changed = True
+
         if self.database != '':
             if not self.database_exists():
                 self.client.create_database(self.database)
@@ -126,6 +130,18 @@ class InfluxdbUser:
                     changed = True
 
         return changed
+
+    def is_user_password_valid(self):
+        is_valid = True
+
+        try:
+            user_client = InfluxDBClient(self.login_host, self.login_port, self.user, self.password)
+            user_client.query('SHOW MEASUREMENTS', None, None, 200, self.database)
+        except:
+            is_valid = False
+
+        return is_valid
+
 
 def main():
     module = AnsibleModule(
