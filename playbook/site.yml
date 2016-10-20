@@ -17,7 +17,7 @@
     - influxdb-relay
 
 - name: influxdb telegraf
-  hosts: telegraf
+  hosts: telegraf:telegraf-statsd
   gather_facts: true
   become: true
   roles:

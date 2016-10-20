@@ -1,0 +1,1 @@
+telegraf_statsd_enabled: "{{ 'telegraf_statsd' in group_names }}"
