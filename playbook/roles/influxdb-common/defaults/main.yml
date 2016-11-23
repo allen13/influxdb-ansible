@@ -1,5 +1,5 @@
 influxdb_api_host: "{{ hostvars[groups['influxdb'][0]]['private_ip'] }}"
-influxdb_api_url: http://{{ influxdb_api_host }}:8086
+influxdb_api_url: http://{{ influxdb_api_host }}:9096
 
 influxdb_admin_user: admin
 influxdb_admin_password: admin
