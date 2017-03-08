@@ -1,1 +1,2 @@
 telegraf_statsd_enabled: "{{ 'telegraf-statsd' in group_names }}"
+telegraf_tags: []

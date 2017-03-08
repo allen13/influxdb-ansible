@@ -1,7 +1,7 @@
 influxdb_leader_ip: "{{ hostvars[groups['influxdb'][0]]['private_ip'] }}"
 influxdb_continuous_queries_log_enabled: "false"
 influxdb_http_log_enabled: "false"
-
+influxdb_max_values_per_tag: "{{ 10**6 }}"
 influxdb_retentions: 5m:rp_60d,30m:rp_52w
 influxdb_retention_policies:
   - name: rp_7d
